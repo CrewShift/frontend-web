@@ -299,6 +299,8 @@ const FLIGHT_DATA = [
   },
 ];
 
+//let FLIGHT_DATA_2 = await fetchScheduleInfo();
+
 // Helper functions
 const formatDate = (date: Date): string =>
   date.toLocaleDateString("en-US", {
@@ -325,26 +327,21 @@ const calculateDuration = (depTime: string, arrTime: string): string => {
 const generateCalendarData = (month: number): CalendarDay[] => {
   const firstDay = new Date(2025, month, 1);
   const lastDay = new Date(2025, month + 1, 0);
-  let startDay = firstDay.getDay();
-  startDay = startDay === 0 ? 6 : startDay - 1;
-
   const daysInMonth = lastDay.getDate();
-  const prevMonthDays = new Date(2025, month, 0).getDate();
+  const startDay = firstDay.getDay(); // Get the start day of the current month
+
+  // Calculate the start index for the grid (skip previous month days)
+  let startIndex = startDay === 0 ? 6 : startDay - 1; // Adjusting Sunday to be the last day
+
   const days: CalendarDay[] = [];
 
-  for (let i = startDay - 1; i >= 0; i--) {
-    days.push({
-      date: prevMonthDays - i,
-      month: month - 1,
-      isCurrentMonth: false,
-    });
-  }
-
+  // Add current month's days
   for (let i = 1; i <= daysInMonth; i++) {
     days.push({ date: i, month: month, isCurrentMonth: true });
   }
 
-  const remainder = (7 - (days.length % 7)) % 7;
+  // Add the days for the next month to fill the grid if necessary
+  const remainder = (7 - ((days.length + startIndex) % 7)) % 7;
   for (let i = 1; i <= remainder; i++) {
     days.push({ date: i, month: month + 1, isCurrentMonth: false });
   }
@@ -467,7 +464,7 @@ const FlightCrewApp: React.FC = () => {
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-gray-100">
       {/* Top Dark Section */}
-      <div className="w-full bg-gray-900 px-4 py-6 text-white shadow-lg sm:px-6 lg:px-8">
+      <div className="w-full bg-neutral-950 px-4 py-6 text-white shadow-lg sm:px-6 lg:px-8">
         <div className="mx-auto max-w-screen-xl">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             {/* Welcome Section */}
